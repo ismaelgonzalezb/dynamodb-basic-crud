@@ -2,6 +2,8 @@ const {
   PutItemCommand,
   ScanCommand,
   GetItemCommand,
+  UpdateItemCommand,
+  DeleteItemCommand,
 } = require("@aws-sdk/client-dynamodb");
 
 const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
@@ -52,4 +54,45 @@ async function getUserById(id, country) {
   console.log(result);
 }
 
-getUserById("7f7838d3-4626-419a-8894-34f490cbd723", "DR");
+// getUserById("1fef818c-1736-48b4-8aea-98fda6473253", "PR");
+
+async function updateUser(id, country, attributes) {
+  const itemKeys = Object.keys(attributes);
+  const command = new UpdateItemCommand({
+    TableName: "users",
+    Key: marshall({ id, country }),
+    ReturnValues: "ALL_NEW",
+    UpdateExpression: `SET ${itemKeys
+      .map((k, index) => `#field${index} = :value${index}`)
+      .join(", ")}`,
+    ExpressionAttributeNames: itemKeys.reduce(
+      (accumulator, k, index) => ({ ...accumulator, [`#field${index}`]: k }),
+      {}
+    ),
+    ExpressionAttributeValues: marshall(
+      itemKeys.reduce(
+        (accumulator, k, index) => ({
+          ...accumulator,
+          [`:value${index}`]: attributes[k],
+        }),
+        {}
+      )
+    ),
+  });
+  const result = await client.send(command);
+  console.log(result);
+}
+updateUser("886f1c37-9635-4ce7-a018-d19bf2b3a449", "PR", {
+  email: "luisr@yopmail.com",
+});
+
+async function deleteUser(id, country) {
+  const command = new DeleteItemCommand({
+    TableName: "users",
+    Key: marshall({ id, country }),
+  });
+  await client.send(command);
+  console.log("User deleted successfully");
+}
+
+// deleteUser("f0d858ba-1e56-4953-a470-3a6eeeccf0cf", "PR");
