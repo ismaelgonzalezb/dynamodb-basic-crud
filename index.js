@@ -1,46 +1,35 @@
-const { CreateTableCommand } = require("@aws-sdk/client-dynamodb");
-const { client } = require("./client");
+const {UsersService} = require('./services');
 
-const params = {
-  AttributeDefinitions: [
-    {
-      AttributeName: "id",
-      AttributeType: "S",
-    },
-    {
-      AttributeName: "country",
-      AttributeType: "S",
-    },
-  ],
-  KeySchema: [
-    {
-      AttributeName: "id",
-      KeyType: "HASH",
-    },
-    {
-      AttributeName: "country",
-      KeyType: "RANGE",
-    },
-  ],
-  ProvisionedThroughput: {
-    ReadCapacityUnits: 1,
-    WriteCapacityUnits: 1,
-  },
-  TableName: "users",
-  StreamSpecification: {
-    StreamEnabled: false,
-  },
-};
+class Main {
+  #usersServices = null;
 
-async function run() {
-  try {
-    const command = new CreateTableCommand(params);
-    const result = await client.send(command);
+  constructor() {
+    this.#usersServices = new UsersService();
+  }
 
-    console.log(result);
-  } catch (ex) {
-    console.log(ex);
+  async create(userToCreate) {
+    await this.#usersServices.create(userToCreate);
+  }
+
+  async find() {
+    const users = await this.#usersServices.find();
+    console.log(users);
+  }
+
+  async findOne(id, country) {
+    const user = await this.#usersServices.findOne(id, country);
+    console.log(user);
+  }
+
+  async update(id, country, attributes){
+    await this.#usersServices.update(id, country, attributes);
+  }
+
+  async remove(id, country) {
+    await this.#usersServices.remove(id, country);
   }
 }
 
-run();
+const main = new Main();
+
+main.remove("06841d03-1b48-4ab3-bda9-f78d55a25928", "IT");
