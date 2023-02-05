@@ -1,13 +1,10 @@
 const { unmarshall } = require("@aws-sdk/util-dynamodb");
 
-const { UsersRepository } = require("../repositories");
-const { dynamoDbClient } = require("../db");
-
 class UsersService {
   #usersRepository = null;
 
-  constructor() {
-    this.#usersRepository = new UsersRepository(dynamoDbClient);
+  constructor(usersRepository) {
+    this.#usersRepository = usersRepository;
   }
 
   async create(userToCreate) {

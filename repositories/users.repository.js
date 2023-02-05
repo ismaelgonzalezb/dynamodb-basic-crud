@@ -8,12 +8,14 @@ const {
 const { marshall } = require("@aws-sdk/util-dynamodb");
 const uuidV4 = require("uuid").v4;
 
+const { dynamoDbClient } = require("../db/providers")
+
 class UsersRepository {
   #dynamoClient = null;
   #dynamoTableName = "users";
 
-  constructor(dynamoClient) {
-    this.#dynamoClient = dynamoClient;
+  constructor() {
+    this.#dynamoClient = dynamoDbClient;
   }
 
   async create(userToCreate) {

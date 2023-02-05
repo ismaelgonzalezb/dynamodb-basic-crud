@@ -1,10 +1,13 @@
+const { UsersRepository, UsersRepositorySQLite } = require("./repositories");
 const {UsersService} = require('./services');
 
 class Main {
   #usersServices = null;
 
   constructor() {
-    this.#usersServices = new UsersService();
+    // const usersRepositoryDynamo = new UsersRepository();
+    const usersRepositorySQLite = new UsersRepositorySQLite();
+    this.#usersServices = new UsersService(usersRepositorySQLite);
   }
 
   async create(userToCreate) {
@@ -32,4 +35,4 @@ class Main {
 
 const main = new Main();
 
-main.remove("06841d03-1b48-4ab3-bda9-f78d55a25928", "IT");
+main.find();
